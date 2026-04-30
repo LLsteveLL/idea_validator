@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from app.services.llm import get_chat_model
 from app.services.prompt_loader import render_prompt
+from app.services.tracing import traceable, with_path_debug
 from app.schemas.state import GraphState
 
 
@@ -43,6 +44,7 @@ def _fallback_risk_analysis(clarified: dict) -> dict:
     }
 
 
+@traceable(name="risk_agent")
 def risk_agent(state: GraphState) -> dict:
     """输出主要风险、隐藏假设和总体风险等级。"""
     clarified = state["clarified_input"]
@@ -53,6 +55,6 @@ def risk_agent(state: GraphState) -> dict:
         llm = get_chat_model(temperature=0.2)
         structured_llm = llm.with_structured_output(RiskAnalysis)
         risk = structured_llm.invoke(prompt)
-        return {"risk": risk.model_dump()}
+        return with_path_debug({"risk": risk.model_dump()}, llm_used=True)
     except Exception:
-        return {"risk": _fallback_risk_analysis(clarified)}
+        return with_path_debug({"risk": _fallback_risk_analysis(clarified)}, llm_used=False)

@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from app.core.logging import get_logger
 from app.services.llm import get_chat_model
 from app.services.prompt_loader import render_prompt
+from app.services.tracing import traceable, with_path_debug
 from app.services.web_search import SearchResult, SearchUnavailableError, format_search_context, search_web
 from app.schemas.state import GraphState
 
@@ -61,6 +62,7 @@ def _serialize_results(results: list[SearchResult]) -> list[dict]:
     return [{"title": item.title, "url": item.url, "content": item.content} for item in results]
 
 
+@traceable(name="market_agent")
 def market_agent(state: GraphState) -> dict:
     """返回一个面向需求判断的市场分析结果。"""
     clarified = state["clarified_input"]
@@ -85,12 +87,12 @@ def market_agent(state: GraphState) -> dict:
         llm = get_chat_model(temperature=0.2)
         structured_llm = llm.with_structured_output(MarketAnalysis)
         market = structured_llm.invoke(prompt)
-        return {
+        return with_path_debug({
             "market": market.model_dump(),
             "market_search_results": _serialize_results(search_results),
-        }
+        }, llm_used=True)
     except Exception:
-        return {
+        return with_path_debug({
             "market": _fallback_market_analysis(clarified),
             "market_search_results": _serialize_results(search_results),
-        }
+        }, llm_used=False)

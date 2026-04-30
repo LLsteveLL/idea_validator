@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from app.services.llm import get_chat_model
 from app.services.prompt_loader import render_prompt
 from app.services.scoring import compute_score_breakdown, derive_verdict
+from app.services.tracing import traceable, with_path_debug
 from app.schemas.output import FinalReport
 from app.schemas.state import GraphState
 
@@ -40,6 +41,7 @@ def _fallback_final_report(state: GraphState, verdict: str, score_breakdown) -> 
     return report.model_dump()
 
 
+@traceable(name="final_synthesizer")
 def final_synthesizer(state: GraphState) -> dict:
     """汇总中间分析结果，并生成 `FinalReport`。"""
     market_score = state["market"]["score"]
@@ -81,6 +83,6 @@ def final_synthesizer(state: GraphState) -> dict:
             key_assumptions=narrative.key_assumptions,
             next_steps=narrative.next_steps,
         )
-        return {"final": report.model_dump()}
+        return with_path_debug({"final": report.model_dump()}, llm_used=True)
     except Exception:
-        return {"final": _fallback_final_report(state, verdict, score_breakdown)}
+        return with_path_debug({"final": _fallback_final_report(state, verdict, score_breakdown)}, llm_used=False)

@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from app.services.llm import get_chat_model
 from app.services.prompt_loader import render_prompt
+from app.services.tracing import traceable, with_path_debug
 from app.schemas.state import GraphState
 
 
@@ -40,6 +41,7 @@ def _fallback_clarified_idea(idea_input: dict) -> dict:
     }
 
 
+@traceable(name="clarify_idea")
 def clarify_idea(state: GraphState) -> dict:
     """使用 LLM 澄清输入；若失败则回退到本地标准化逻辑。"""
     idea_input = state["input"]
@@ -61,8 +63,8 @@ def clarify_idea(state: GraphState) -> dict:
         llm = get_chat_model(temperature=0)
         structured_llm = llm.with_structured_output(ClarifiedIdea)
         clarified = structured_llm.invoke(prompt)
-        return {"clarified_input": clarified.model_dump()}
+        return with_path_debug({"clarified_input": clarified.model_dump()}, llm_used=True)
     except Exception:
         # 第一版不要因为 LLM 或密钥配置问题直接让整条 graph 失败。
         clarified = _fallback_clarified_idea(idea_input)
-        return {"clarified_input": clarified}
+        return with_path_debug({"clarified_input": clarified}, llm_used=False)
