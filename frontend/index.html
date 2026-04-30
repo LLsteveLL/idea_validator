@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Idea Validator</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="./index.html">Idea Validator</a>
+        <nav class="nav">
+          <a href="./history.html">History</a>
+        </nav>
+      </header>
+
+      <main class="hero-grid">
+        <section class="hero-copy card card-hero">
+          <p class="eyebrow">Startup Decision Support</p>
+          <h1>Validate a startup idea before you build it.</h1>
+          <p class="lede">
+            Get a structured verdict, score breakdown, major risks, and a
+            practical validation plan from your FastAPI + LangGraph backend.
+          </p>
+          <div class="hero-points">
+            <span>Multi-step analysis</span>
+            <span>Web search enriched</span>
+            <span>Historical idea retrieval</span>
+          </div>
+        </section>
+
+        <section class="card form-card">
+          <div class="section-head">
+            <p class="eyebrow">Input</p>
+            <h2>Walk through one field at a time</h2>
+          </div>
+
+          <form id="idea-form" class="idea-form">
+            <div class="wizard-head">
+              <div>
+                <p id="wizard-step-label" class="eyebrow">Step 1 of 9</p>
+                <h3 id="wizard-question" class="wizard-question"></h3>
+                <p id="wizard-hint" class="wizard-hint"></p>
+                <p id="wizard-example" class="wizard-example"></p>
+              </div>
+              <div class="progress-track" aria-hidden="true">
+                <div id="progress-bar" class="progress-bar"></div>
+              </div>
+            </div>
+
+            <div id="wizard-fields" class="wizard-fields">
+              <label class="wizard-panel active" data-step="0">
+                <span>Idea</span>
+                <textarea name="idea" rows="4" required placeholder="An AI fitness coach app for busy office workers"></textarea>
+              </label>
+
+              <label class="wizard-panel" data-step="1">
+                <span>Target User</span>
+                <input name="target_user" required placeholder="Busy office workers" />
+              </label>
+
+              <label class="wizard-panel" data-step="2">
+                <span>Problem</span>
+                <textarea name="problem" rows="4" required placeholder="They do not know how to plan workouts and stay consistent"></textarea>
+              </label>
+
+              <label class="wizard-panel" data-step="3">
+                <span>Monetization</span>
+                <input name="monetization" placeholder="Monthly subscription" />
+              </label>
+
+              <label class="wizard-panel" data-step="4">
+                <span>Resources</span>
+                <input name="resources" placeholder="Product and AI engineering" />
+              </label>
+
+              <label class="wizard-panel" data-step="5">
+                <span>Stage</span>
+                <input name="stage" placeholder="idea / prototype / early users" />
+              </label>
+
+              <label class="wizard-panel" data-step="6">
+                <span>Geography</span>
+                <input name="geography" placeholder="US / China / Global" />
+              </label>
+
+              <label class="wizard-panel" data-step="7">
+                <span>Notes</span>
+                <textarea name="notes" rows="4" placeholder="Any extra context worth considering"></textarea>
+              </label>
+
+              <section class="wizard-panel review-panel" data-step="8">
+                <span>Review</span>
+                <div id="review-list" class="review-list"></div>
+              </section>
+            </div>
+
+            <div class="form-actions">
+              <button id="back-button" type="button" class="button-secondary">
+                Back
+              </button>
+              <button id="next-button" type="button" class="button-primary">
+                Next
+              </button>
+              <button id="submit-button" type="submit" class="button-primary hidden">
+                Analyze
+              </button>
+              <p id="form-status" class="status-text" aria-live="polite"></p>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./js/index.js"></script>
+  </body>
+  </html>

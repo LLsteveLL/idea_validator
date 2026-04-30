@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analyzing Idea</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="./index.html">Idea Validator</a>
+      </header>
+
+      <main class="loading-layout">
+        <section class="card loading-card">
+          <p class="eyebrow">Analysis In Progress</p>
+          <h1>Analyzing your idea</h1>
+          <p class="lede">
+            The backend is running the LangGraph workflow, checking market
+            signals, competitor context, risk, and validation logic.
+          </p>
+
+          <div class="loading-steps">
+            <div class="loading-step active">Clarifying the idea</div>
+            <div class="loading-step active">Checking historical matches</div>
+            <div class="loading-step active">Reviewing market and competitors</div>
+            <div class="loading-step active">Synthesizing a verdict</div>
+          </div>
+
+          <div class="progress-track loading-track" aria-hidden="true">
+            <div class="progress-bar loading-bar"></div>
+          </div>
+
+          <p id="loading-status" class="status-text">Sending analysis request...</p>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./js/loading.js"></script>
+  </body>
+  </html>

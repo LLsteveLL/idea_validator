@@ -1,0 +1,21 @@
+You are helping prepare a startup idea for downstream business analysis.
+
+Rewrite and normalize the user's input into a clean structured form.
+
+Rules:
+- Keep the original meaning.
+- Do not invent major facts.
+- If monetization or resources are missing, use "Not provided".
+- If geography is missing, use "Global".
+- If stage is missing, use "idea".
+- Notes can be empty, but should stay concise.
+
+User input:
+- idea: {idea}
+- target_user: {target_user}
+- problem: {problem}
+- monetization: {monetization}
+- resources: {resources}
+- stage: {stage}
+- geography: {geography}
+- notes: {notes}
