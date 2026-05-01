@@ -4,7 +4,19 @@ from fastapi.testclient import TestClient
 
 from app.db.session import init_db
 from app.main import app
-from app.schemas.output import FinalReport, ScoreBreakdown
+from app.schemas.output import (
+    EvidenceItem,
+    FinalReport,
+    LocalizedNarrative,
+    LocalizedScoreExplanationText,
+    LocalizedScoreExplanationTextSet,
+    ReportEvidence,
+    ReportTranslations,
+    ScoreBreakdown,
+    ScoreExplanation,
+    ScoreExplanationSet,
+    SimilarAnalysisEvidence,
+)
 
 
 def test_health_endpoint(temp_db_settings):
@@ -31,11 +43,119 @@ def test_analyze_persists_and_history_endpoints_work(temp_db_settings, monkeypat
             weighted_risk=6,
             overall_score=61,
         ),
+        score_explanations=ScoreExplanationSet(
+            market=ScoreExplanation(
+                score=70,
+                weighted_score=24,
+                rationale="Clear problem statement.",
+                positive_signals=["Clear target user"],
+                negative_signals=["Needs stronger evidence"],
+            ),
+            competition=ScoreExplanation(
+                score=50,
+                weighted_score=10,
+                rationale="Competition looks moderate.",
+                positive_signals=["Some differentiation exists"],
+                negative_signals=["Crowded category"],
+            ),
+            business=ScoreExplanation(
+                score=60,
+                weighted_score=18,
+                rationale="Monetization is understandable.",
+                positive_signals=["Subscription model"],
+                negative_signals=["Unknown acquisition cost"],
+            ),
+            risk=ScoreExplanation(
+                score=40,
+                weighted_score=6,
+                rationale="Execution still looks fragile.",
+                positive_signals=["Can be validated quickly"],
+                negative_signals=["Users may not pay"],
+            ),
+        ),
+        translations=ReportTranslations(
+            en=LocalizedNarrative(
+                summary="Useful but needs validation.",
+                opportunities=["Clear target user"],
+                risks=["Crowded category"],
+                key_assumptions=["Users will pay"],
+                next_steps=["Interview users"],
+                score_explanations=LocalizedScoreExplanationTextSet(
+                    market=LocalizedScoreExplanationText(
+                        rationale="Clear problem statement.",
+                        positive_signals=["Clear target user"],
+                        negative_signals=["Needs stronger evidence"],
+                    ),
+                    competition=LocalizedScoreExplanationText(
+                        rationale="Competition looks moderate.",
+                        positive_signals=["Some differentiation exists"],
+                        negative_signals=["Crowded category"],
+                    ),
+                    business=LocalizedScoreExplanationText(
+                        rationale="Monetization is understandable.",
+                        positive_signals=["Subscription model"],
+                        negative_signals=["Unknown acquisition cost"],
+                    ),
+                    risk=LocalizedScoreExplanationText(
+                        rationale="Execution still looks fragile.",
+                        positive_signals=["Can be validated quickly"],
+                        negative_signals=["Users may not pay"],
+                    ),
+                ),
+            ),
+            zh=LocalizedNarrative(
+                summary="这个方向有用，但还需要验证。",
+                opportunities=["目标用户清晰"],
+                risks=["赛道比较拥挤"],
+                key_assumptions=["用户愿意付费"],
+                next_steps=["先访谈用户"],
+                score_explanations=LocalizedScoreExplanationTextSet(
+                    market=LocalizedScoreExplanationText(
+                        rationale="问题定义比较清楚。",
+                        positive_signals=["目标用户明确"],
+                        negative_signals=["还缺更强证据"],
+                    ),
+                    competition=LocalizedScoreExplanationText(
+                        rationale="竞争程度中等。",
+                        positive_signals=["还有一些差异化空间"],
+                        negative_signals=["赛道拥挤"],
+                    ),
+                    business=LocalizedScoreExplanationText(
+                        rationale="变现方式能说得通。",
+                        positive_signals=["订阅模型清晰"],
+                        negative_signals=["获客成本未知"],
+                    ),
+                    risk=LocalizedScoreExplanationText(
+                        rationale="执行仍然比较脆弱。",
+                        positive_signals=["可以快速验证"],
+                        negative_signals=["用户可能不愿付费"],
+                    ),
+                ),
+            ),
+        ),
         summary="Useful but needs validation.",
         opportunities=["Clear target user"],
         risks=["Crowded category"],
         key_assumptions=["Users will pay"],
         next_steps=["Interview users"],
+        evidence=ReportEvidence(
+            market_search=[
+                EvidenceItem(title="Market result", url="https://example.com/market", summary="Market context"),
+            ],
+            competitor_search=[
+                EvidenceItem(title="Competitor result", url="https://example.com/competitor", summary="Competitor context"),
+            ],
+            similar_analyses=[
+                SimilarAnalysisEvidence(
+                    analysis_id=1,
+                    similarity=0.9,
+                    idea="AI fitness coach app",
+                    verdict="narrow",
+                    overall_score=61,
+                    summary="Similar historical run",
+                )
+            ],
+        ),
         analysis_id=None,
     )
 

@@ -10,6 +10,101 @@ from typing import List, Literal, Optional
 from pydantic import BaseModel, Field
 
 
+class ScoreExplanation(BaseModel):
+    """单个评分维度的解释。"""
+
+    score: int = Field(ge=0, le=100)
+    """该维度的原始分数。"""
+
+    weighted_score: int = Field(ge=0, le=100)
+    """该维度加权后的贡献分。"""
+
+    rationale: str
+    """这一维度为什么得到这个分数。"""
+
+    positive_signals: List[str]
+    """拉高该维度分数的证据或信号。"""
+
+    negative_signals: List[str]
+    """拉低该维度分数的证据或信号。"""
+
+
+class LocalizedScoreExplanationText(BaseModel):
+    """某个评分维度的本地化文本解释。"""
+
+    rationale: str
+    positive_signals: List[str]
+    negative_signals: List[str]
+
+
+class LocalizedScoreExplanationTextSet(BaseModel):
+    """四个维度的本地化评分解释文本。"""
+
+    market: LocalizedScoreExplanationText
+    competition: LocalizedScoreExplanationText
+    business: LocalizedScoreExplanationText
+    risk: LocalizedScoreExplanationText
+
+
+class ScoreExplanationSet(BaseModel):
+    """四个核心维度的评分解释。"""
+
+    market: ScoreExplanation
+    competition: ScoreExplanation
+    business: ScoreExplanation
+    risk: ScoreExplanation
+
+
+class LocalizedNarrative(BaseModel):
+    """某种语言下的报告文本内容。"""
+
+    summary: str
+    opportunities: List[str]
+    risks: List[str]
+    key_assumptions: List[str]
+    next_steps: List[str]
+    score_explanations: LocalizedScoreExplanationTextSet
+
+
+class ReportTranslations(BaseModel):
+    """中英文双语报告内容。"""
+
+    en: LocalizedNarrative
+    zh: LocalizedNarrative
+
+
+class EvidenceItem(BaseModel):
+    """展示给前端的证据条目。"""
+
+    title: str
+    """证据标题。"""
+
+    url: Optional[str] = None
+    """证据链接。"""
+
+    summary: str
+    """证据摘要。"""
+
+
+class SimilarAnalysisEvidence(BaseModel):
+    """相似历史分析摘要。"""
+
+    analysis_id: Optional[int] = None
+    similarity: float
+    idea: str
+    verdict: Optional[str] = None
+    overall_score: Optional[int] = None
+    summary: str
+
+
+class ReportEvidence(BaseModel):
+    """最终报告中的可见证据集合。"""
+
+    market_search: List[EvidenceItem]
+    competitor_search: List[EvidenceItem]
+    similar_analyses: List[SimilarAnalysisEvidence]
+
+
 class ScoreBreakdown(BaseModel):
     """分项评分结果。"""
 
@@ -59,6 +154,12 @@ class FinalReport(BaseModel):
     score_breakdown: ScoreBreakdown
     """分项评分明细，便于解释总分由哪些维度组成。"""
 
+    score_explanations: ScoreExplanationSet
+    """每个评分维度的解释，以及拉高/拉低分数的证据。"""
+
+    translations: ReportTranslations
+    """结果页可切换显示的中英文版本。"""
+
     summary: str
     """对整个 idea 的简要总结，说明为什么得到这个结论。"""
 
@@ -73,6 +174,9 @@ class FinalReport(BaseModel):
 
     next_steps: List[str]
     """建议用户接下来执行的具体动作。"""
+
+    evidence: ReportEvidence
+    """用于支撑判断的 search/retrieval 证据摘要。"""
 
     analysis_id: Optional[int] = None
     """持久化后的分析记录 ID，便于后续查询历史结果。"""

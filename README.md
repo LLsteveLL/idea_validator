@@ -308,6 +308,43 @@ The frontend currently provides:
 - a final review step before submit
 - a loading transition page during analysis
 - result, history, and detail pages backed by the FastAPI API
+- an English / Simplified Chinese toggle on result and detail views
+- readable submission cards instead of raw JSON payload dumps
+- evidence sections for market search, competitor search, and similar analyses
+- score explanation cards that show why each dimension received its score
+
+## Bilingual Output
+
+The final synthesis step now produces both English and Simplified Chinese
+versions of the narrative content.
+
+This includes:
+
+- summary
+- opportunities
+- risks
+- key assumptions
+- next steps
+- score explanation narratives
+
+The API keeps a stable top-level English response for compatibility, while also
+returning `translations.en` and `translations.zh` so the frontend can switch
+languages instantly without re-running the analysis.
+
+## Explainability And Evidence
+
+The final report now exposes more than a single score.
+
+It includes:
+
+- `score_breakdown`: raw and weighted scores per dimension
+- `score_explanations`: rationale plus positive and negative signals for each dimension
+- `evidence.market_search`: visible market research snippets
+- `evidence.competitor_search`: visible competitor research snippets
+- `evidence.similar_analyses`: retrieved historical analyses used as memory
+
+This makes the product more useful as a decision tool instead of a black-box
+verdict generator.
 
 ## Running Tests
 

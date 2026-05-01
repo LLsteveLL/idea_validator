@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from pydantic import BaseModel
+
 from app.graph.builder import run_analysis
 from app.schemas.input import IdeaInput
 
@@ -11,20 +13,26 @@ class DummyStructuredLLM:
         self.schema = schema
 
     def invoke(self, _prompt: str):
-        values: dict[str, Any] = {}
-        for name, field in self.schema.model_fields.items():
-            annotation = field.annotation
-            if annotation is int:
-                values[name] = 60
-            elif annotation is str:
-                values[name] = f"{name}-value"
+        return self.schema(**build_model_values(self.schema))
+
+
+def build_model_values(schema: type[BaseModel]) -> dict[str, Any]:
+    values: dict[str, Any] = {}
+    for name, field in schema.model_fields.items():
+        annotation = field.annotation
+        if annotation is int:
+            values[name] = 60
+        elif annotation is str:
+            values[name] = f"{name}-value"
+        elif isinstance(annotation, type) and issubclass(annotation, BaseModel):
+            values[name] = build_model_values(annotation)
+        else:
+            origin = getattr(annotation, "__origin__", None)
+            if origin is list:
+                values[name] = [f"{name}-item"]
             else:
-                origin = getattr(annotation, "__origin__", None)
-                if origin is list:
-                    values[name] = [f"{name}-item"]
-                else:
-                    values[name] = f"{name}-value"
-        return self.schema(**values)
+                values[name] = f"{name}-value"
+    return values
 
 
 class DummyLLM:
@@ -95,3 +103,4 @@ def test_run_analysis_with_mocked_llm_search_and_retrieval(monkeypatch):
     assert len(result["similar_analyses"]) == 1
     assert result["final"]["verdict"] in {"go", "narrow", "no-go"}
     assert "score_breakdown" in result["final"]
+    assert "translations" in result["final"]
